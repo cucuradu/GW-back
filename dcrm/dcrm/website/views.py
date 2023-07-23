@@ -4,10 +4,12 @@ from django.contrib import messages
 from .forms import SignUpForm
 from .models import Record
 from .models import Sensor
+from .models import Plant
 
 def home(request):
     records = Record.objects.all()
     sensors = Sensor.objects.all()
+    plants = Plant.objects.all()
 
     # Check if logging in
     if request.method == 'POST':
@@ -23,7 +25,7 @@ def home(request):
             messages.error(request, 'There was an error')
             return redirect('home')
     else:
-        return render(request, 'home.html', {'records':records})
+        return render(request, 'home.html', {'records':records, 'sensors':sensors, 'plants':plants})
 
 
 def logout_user(request):
