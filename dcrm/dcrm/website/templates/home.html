@@ -48,7 +48,24 @@
           <td>{{ sensor.sensor_name }}</td>
           <td>{{ sensor.sensor_info_temperature }} °C</td>
           <td>{{ sensor.sensor_info_humidity }} %</td>
-          <td>{{ sensor.id }}</td>        
+          <td>{{ sensor.id }}</td>
+          <td>{% if plants %}
+            {% for sensor in sensors %}
+              {% for plant in plants %}
+                {% if sensor.sensor_type == plant.usual_name %}
+                  {% if sensor.sensor_info_temperature != plant.temperature %}
+                    <div class="alert alert-warning" role="alert">
+                      Alert
+                    </div>
+                  {% elif sensor.sensor_info_temperature == plant.temperature %}
+                    <div class="alert alert-success" role="alert">
+                      Good
+                    </div>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+            {% endif %}</td>        
         </tr>
         {% endfor %}
       {% endif %}
@@ -56,25 +73,6 @@
 </table>
 </br>
 
-{% if sensors %}
-  {% if plants %}
-  {% for sensor in sensors %}
-    {% for plant in plants %}
-      {% if sensor.sensor_type == plant.usual_name %}
-        {% if sensor.sensor_info_temperature != plant.temperature %}
-          <div class="alert alert-warning" role="alert">
-            Alert for {{sensor.sensor_name}}
-          </div>
-        {% elif sensor.sensor_info_temperature == plant.temperature %}
-          <div class="alert alert-success" role="alert">
-            A simple success alert—check it out!
-          </div>
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-  {% endfor %}
-  {% endif %}
-{% endif %}
 
 {% else %}
 <h1>Login</h1>
