@@ -68,6 +68,7 @@ def updateSensor(request, pk):
     sensor = Sensor.objects.get(id=pk)
     serializer = SensorSerializer(sensor, data=request.POST)
     if serializer.is_valid():
+        
         serializer.save()
 
     return Response(serializer.data)
