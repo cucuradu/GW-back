@@ -84,18 +84,3 @@ def deleteSensor(request, pk):
 
     sensor.delete()
     return Response(serializer.data)
-
-@api_view(['POST'])
-def user_login(request):
-    User = get_user_model()
-
-    username = request.data.get('username')
-    password = request.data.get('password')
-
-    user = User.objects.get(username=username)
-
-    if user.check_password(password):
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key})
-    else:
-        return Response({'error': 'Invalid credentials'}, status=400)
