@@ -38,7 +38,11 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
+<<<<<<< HEAD
 VIRTUAL_ENV="D:\GrowWise\GrowWiseBack-end\dcrm\virt"
+=======
+VIRTUAL_ENV="C:\Users\ALEXANDRA\Desktop\GrowWise\GrowWiseBack-end\dcrm\virt"
+>>>>>>> 6e966b16f9accc60b0bb8e2585b64e63ec9f7982
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
