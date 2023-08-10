@@ -88,10 +88,19 @@ def deleteSensor(request, pk):
     sensor.delete()
     return Response(serializer.data)
 
-def get(format=None):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+@api_view(['GET'])
+def getRecommendation(request):
+    sensors = Sensor.objects.all()
+    recommandations = []
+
+    for sensor in sensors:
+        if not sensor.humidity:
+            recommandation = f"For sensor '{sensor.name}': Very low humidity level. Please take necessary actions."
+
+        recommandations.append(recommandation)
+
+    response_data = {"recomandations": recommandations}
+    return Response(response_data)
 
 class UserRecordView(APIView):
     """
