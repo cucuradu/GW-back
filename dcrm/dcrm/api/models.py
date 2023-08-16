@@ -4,7 +4,9 @@ class Sensor(models.Model):
     name = models.TextField(max_length=50)
     humidity = models.BooleanField(default=False)
     temperature = models.FloatField(default=0.0)
-    npk = models.CharField(max_length=100)
+    nitrogen = models.FloatField(default=0.0)
+    phosphorus = models.FloatField(default=0.0)
+    potassium = models.FloatField(default=0.0)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     
