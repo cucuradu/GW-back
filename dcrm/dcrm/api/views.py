@@ -61,22 +61,42 @@ def getSensor(request, pk):
 def createSensor(request):
     data = request.data
 
+    sensor_name = data.get('name', None)
+    sensor_humidity = data.get('humidity', False)
+    sensor_temperature = data.get('temperature', 0.0)
+    sensor_nitrogen = data.get('nitrogen', 0.0)
+    sensor_phosphorus = data.get('phosphorus', 0.0)
+    sensor_potassium = data.get('potassium', 0.0)
+
     sensor = Sensor.objects.create(
-        name=data['name']
+        name = sensor_name,
+        humidity = sensor_humidity,
+        temperature = sensor_temperature,
+        nitrogen = sensor_nitrogen,
+        phosphorus = sensor_phosphorus,
+        potassium = sensor_potassium
     )
+
     serializer = SensorSerializer(sensor, many=False)
-    return Response(serializer.data)
+    return Response(serializer.data, status.HTTP_201_CREATED)
 
 @api_view(['PUT'])
 def updateSensor(request, pk):
+    try:
+        sensor = Sensor.objects.get(pk=pk)
+    except Sensor.DoesNotExist:
+        return Response({"error": "Sensor not found"}, status=status.HTTP_404_NOT_FOUND)
+    
     data = request.data
 
-    sensor = Sensor.objects.get(id=pk)
-    serializer = SensorSerializer(sensor, data=request.POST)
-    if serializer.is_valid():
-        
-        serializer.save()
+    sensor.humidity = data.get('humidity', sensor.humidity)
+    sensor.temperature = data.get('temperature', sensor.temperature)
+    sensor.nitrogen = data.get('nitrogen', sensor.nitrogen)
+    sensor.phosphorus = data.get('phosphorus', sensor.phosphorus)
+    sensor.potassium = data.get('potassium', sensor.potassium)
+    sensor.save()
 
+    serializer = SensorSerializer(sensor, many=False)
     return Response(serializer.data)
 
 @api_view(['DELETE'])
