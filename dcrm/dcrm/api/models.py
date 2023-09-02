@@ -1,7 +1,8 @@
 from django.db import models
 
 class Sensor(models.Model):
-    name = models.TextField(max_length=50)
+    name = models.TextField(max_length=50, default="sensorName")
+    plant = models.CharField(max_length=50, default="none")
     humidity = models.BooleanField(default=False)
     temperature = models.FloatField(default=0.0)
     nitrogen = models.FloatField(default=0.0)

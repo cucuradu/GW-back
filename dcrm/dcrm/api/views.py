@@ -45,6 +45,46 @@ def getRoutes(request):
     ]
     return Response(routes)
 
+plant_ranges = {
+    "Tomato": {"temperature": (10.0, 30.0), "nitrogen": (20.0, 40.0), "phosphorus": (30.0, 50.0), "potassium": (32.0, 60.0)},
+    "Cucumber": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (20.0, 30.0), "potassium": (32.0, 45.0)},
+    "Carrots": {"temperature": (15.0, 20.0), "nitrogen": (40.0, 60.0), "phosphorus": (20.0, 30.0), "potassium": (120.0, 160.0)},
+    "Potatoes": {"temperature": (10.0, 35.0), "nitrogen": (100.0, 150.0), "phosphorus": (150.0, 200.0), "potassium": (200.0, 250.0)},
+}
+
+def generate_recommendation(sensor_reading, plant_ranges):
+    plant_name = sensor_reading.plant
+    plant_range = plant_ranges.get(plant_name) 
+
+    if not plant_range:
+        return "Plant type not found."
+    
+    temperature = sensor_reading.temperature
+    nitrogen = sensor_reading.nitrogen
+    phosphorus =sensor_reading.phosphorus
+    potassium = sensor_reading.potassium
+
+    if plant_range["temperature"][0] <= temperature <= plant_range["temperature"][1]:
+       temperature_recommendation = "Temperature conditions are suitable."
+    else:
+        temperature_recommendation = "Temperature conditions are not optimal."
+
+    nutrient_recommendation = []
+    for nutrient, (min_range, max_range) in plant_range.items():
+        if nutrient == "temperature":
+            continue
+        nutrient_value = getattr(sensor_reading, nutrient)
+        if min_range <= nutrient_value <= max_range:
+            nutrient_recommendation.append(f"{nutrient.capitalize()} level is within range.")
+        else:
+            nutrient_recommendation.append(f"{nutrient.capitalize()} level is not optimal.")
+
+    return {
+        "temperature_recommendation": temperature_recommendation,
+        "nutrient_recommendation": nutrient_recommendation
+    }
+
+
 @api_view(['GET'])
 def getSensors(request):
     sensors = Sensor.objects.all()
@@ -111,16 +151,23 @@ def deleteSensor(request, pk):
 @api_view(['GET'])
 def getRecommendation(request):
     sensors = Sensor.objects.all()
-    recommandations = []
+    recommendations = []
 
     for sensor in sensors:
-        if not sensor.humidity:
-            recommandation = f"For sensor '{sensor.name}': Very low humidity level. Please take necessary actions."
+        recommendation = generate_recommendation(sensor, plant_ranges)
+        recommendations.append({
+            "sensor_data" : {
+                "name": sensor.name,
+                "plant": sensor.plant,
+                "temperature": sensor.temperature,
+                "nitrogen": sensor.nitrogen,
+                "phosphorus": sensor.phosphorus,
+                "potassium": sensor.potassium,
+            },
+            "recommendation": recommendation,
+        })
 
-        recommandations.append(recommandation)
-
-    response_data = {"recomandations": recommandations}
-    return Response(response_data)
+    return Response(recommendations)
 
 # class UserRecordView(APIView):
 #     """
