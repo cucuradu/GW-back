@@ -5,7 +5,7 @@ from . import views
 app_name = 'apiRest'
 urlpatterns = [
     path('', views.getRoutes),
-    # path('user/', UserRecordView.as_view(), name='users'),
+    #path('user/', UserRecordView.as_view(), name='users'),
     path('sensors/', views.getSensors),
     path('sensors/create/', views.createSensor),
     path('sensors/<str:pk>/update/', views.updateSensor),
