@@ -12,4 +12,5 @@ urlpatterns = [
     path('sensors/<str:pk>/', views.getSensor),
     path('sensors/<str:pk>/delete/', views.deleteSensor),
     path('apiRest/recommendations/', views.getRecommendation),
+    path('api/update_sensors/', views.updateSensorData, name='update_sensor'),
 ]
