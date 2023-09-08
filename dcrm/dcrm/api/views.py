@@ -2,7 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import SensorSerializer
 from .models import Sensor
-from .serializers import UserSerializer
+from .serializers import UserTestSerializer
+from .models import UsersTest
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
@@ -191,6 +192,32 @@ def updateSensorData(request):
             sensor.save()
     except Exception as error:
         return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def usersData(request):
+    users = UsersTest.objects.all()
+    serializer = UserTestSerializer(users, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def authenticate_user(request):
+    data = request.data
+    email = data.get('email', None)
+    password = data.get('password', None)
+    
+    if email is None or password is None:
+        return Response({'message': 'Email and password are required.'}, status=400)
+    
+    try:
+        user = UsersTest.objects.get(email=email)
+    except UsersTest.DoesNotExist:
+        return Response({'message': 'User not found.'}, status=404)
+    
+    if user.password == password:
+        serializer = UserTestSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'message': 'Authentication failed.'}, status=401)
 
 # class UserRecordView(APIView):
 #     """

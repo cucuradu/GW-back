@@ -21,6 +21,11 @@ class Sensor(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, unique=True)
-    
+    location = models.CharField(max_length=120, default="locations")
+
     class Meta:
         ordering = ['-updated']
+
+class UsersTest(models.Model):
+    email = models.CharField(max_length=50, default="email")
+    password = models.CharField (max_length=16, default="password")
