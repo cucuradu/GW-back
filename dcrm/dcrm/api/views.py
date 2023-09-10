@@ -55,39 +55,34 @@ plant_ranges = {
 
 def generate_recommendation(sensor_reading, plant_ranges):
     plant_name = sensor_reading.plant
-    plant_range = plant_ranges.get(plant_name)
+    plant_range = plant_ranges.get(plant_name) 
 
     if not plant_range:
         return "Plant type not found."
-
+    
     temperature = sensor_reading.temperature
     nitrogen = sensor_reading.nitrogen
-    phosphorus = sensor_reading.phosphorus
+    phosphorus =sensor_reading.phosphorus
     potassium = sensor_reading.potassium
 
-    temperature_color_code = 1 if plant_range["temperature"][0] <= temperature <= plant_range["temperature"][1] else 0
+    if plant_range["temperature"][0] <= temperature <= plant_range["temperature"][1]:
+       temperature_recommendation = "Temperature conditions are suitable."
+    else:
+        temperature_recommendation = "Temperature conditions are not optimal."
 
     nutrient_recommendation = []
-    nutrient_color_codes = {}
-
     for nutrient, (min_range, max_range) in plant_range.items():
         if nutrient == "temperature":
             continue
         nutrient_value = getattr(sensor_reading, nutrient)
-        nutrient_color_code = 1 if min_range <= nutrient_value <= max_range else 0
-
-        nutrient_color_codes[f"{nutrient}_color"] = nutrient_color_code
-
-        if nutrient_color_code == 0:
-            nutrient_recommendation.append(f"{nutrient.capitalize()} level is not optimal.")
-        else:
+        if min_range <= nutrient_value <= max_range:
             nutrient_recommendation.append(f"{nutrient.capitalize()} level is within range.")
+        else:
+            nutrient_recommendation.append(f"{nutrient.capitalize()} level is not optimal.")
 
     return {
-        "temperature_recommendation": "Temperature conditions are suitable." if temperature_color_code == 1 else "Temperature conditions are not optimal.",
-        "nutrient_recommendation": nutrient_recommendation,
-        **nutrient_color_codes,
-        "temperature_color": temperature_color_code
+        "temperature_recommendation": temperature_recommendation,
+        "nutrient_recommendation": nutrient_recommendation
     }
 
 
@@ -161,25 +156,17 @@ def getRecommendation(request):
 
     for sensor in sensors:
         recommendation = generate_recommendation(sensor, plant_ranges)
-        sensor_data = {
-            "name": sensor.name,
-            "plant": sensor.plant,
-            "temperature": sensor.temperature,
-            "nitrogen": sensor.nitrogen,
-            "phosphorus": sensor.phosphorus,
-            "potassium": sensor.potassium,
-            "id": sensor.id,
-        }
-        
-        if isinstance(recommendation, dict):
-            # Recommendation is a dictionary, so add it to the sensor_data
-            sensor_data["recommendation"] = recommendation
-        else:
-            # Recommendation is a string (e.g., "Plant type not found."), so add it directly
-            sensor_data["recommendation"] = recommendation
-
         recommendations.append({
-            "sensor_data": sensor_data
+            "sensor_data" : {
+                "name": sensor.name,
+                "plant": sensor.plant,
+                "temperature": sensor.temperature,
+                "nitrogen": sensor.nitrogen,
+                "phosphorus": sensor.phosphorus,
+                "potassium": sensor.potassium,
+                "id": sensor.id,
+            },
+            "recommendation": recommendation,
         })
 
     return Response(recommendations)
@@ -188,6 +175,9 @@ def getRecommendation(request):
 def updateSensorData(request):
     updated_data = request.data
 
+    if not isinstance(updated_data, list):
+        return Response({"error": "Invalid input data format."}, status=status.HTTP_400_BAD_REQUEST)
+    
     try:
         for update_entry in updated_data:
             sensor_data = update_entry.get('sensor_data')
@@ -203,6 +193,8 @@ def updateSensorData(request):
             sensor.name = sensor_data.get('name', sensor.name)
             sensor.plant = sensor_data.get('plant', sensor.plant)
             sensor.save()
+
+        return Response({"message": "Sensor data updated successfully."}, status=status.HTTP_200_OK)
     except Exception as error:
         return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -230,7 +222,7 @@ def authenticate_user(request):
         serializer = UserTestSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
-        return Response({'message': 'Authentication failed.'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'message': 'Authentication failed.'}, status=401)
 
 # class UserRecordView(APIView):
 #     """
