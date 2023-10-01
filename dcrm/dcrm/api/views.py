@@ -67,10 +67,14 @@ def generate_recommendation(sensor_reading, plant_ranges):
     phosphorus =sensor_reading.phosphorus
     potassium = sensor_reading.potassium
 
+    problem_count = 0
+
     if plant_range["temperature"][0] <= temperature <= plant_range["temperature"][1]:
        temperature_recommendation = "Temperature conditions are suitable."
+       problem_count = 0
     else:
         temperature_recommendation = "Temperature conditions are not optimal."
+        problem_count += 1
 
     nutrient_recommendation = []
     for nutrient, (min_range, max_range) in plant_range.items():
@@ -81,11 +85,12 @@ def generate_recommendation(sensor_reading, plant_ranges):
             nutrient_recommendation.append(f"{nutrient.capitalize()} level is within range.")
         else:
             nutrient_recommendation.append(f"{nutrient.capitalize()} level is not optimal.")
+            problem_count += 1
 
     return {
         "temperature_recommendation": temperature_recommendation,
         "nutrient_recommendation": nutrient_recommendation
-    }
+    }, problem_count
 
 
 @api_view(['GET'])
@@ -157,7 +162,7 @@ def getRecommendation(request):
     recommendations = []
 
     for sensor in sensors:
-        recommendation = generate_recommendation(sensor, plant_ranges)
+        recommendation, problem_count = generate_recommendation(sensor, plant_ranges)
         recommendations.append({
             "sensor_data" : {
                 "name": sensor.name,
@@ -169,6 +174,7 @@ def getRecommendation(request):
                 "id": sensor.id,
             },
             "recommendation": recommendation,
+            "problem_count": problem_count
         })
 
     return Response(recommendations)
@@ -201,10 +207,19 @@ def updateSensorData(request):
         return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-def usersData(request):
-    users = UsersTest.objects.all()
-    serializer = UserTestSerializer(users, many=True)
-    return Response(serializer.data)
+def usersData(request, id):
+    try:
+        user = UsersTest.objects.get(pk=id)
+    except UsersTest.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = UserTestSerializer(user)
+
+    sensor_data = serializer.data.get('sensors', [])
+
+    response_data = {'sensors': sensor_data}
+
+    return Response(response_data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def addSensorsToUser(request, user_id):

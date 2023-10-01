@@ -13,7 +13,7 @@ urlpatterns = [
     path('sensors/<str:pk>/delete/', views.deleteSensor),
     path('apiRest/recommendations/', views.getRecommendation),
     path('api/update_sensors/', views.updateSensorData, name='update_sensor'),
-    path('api/users/', views.usersData, name='get_users'),
+    path('api/user/<int:id>', views.usersData, name='get_user'),
     path('api/add_sensors_to_user/<str:user_id>/', views.addSensorsToUser, name='add_sensors_to_user'),
     path('api/authenticate/', views.authenticate_user, name='authenticate_user'),
 ]
