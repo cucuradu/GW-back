@@ -1,6 +1,7 @@
 import random
 import string
 from django.db import models
+import json
 
 def generate_unique_id():
     """Generate a unique random 6-character ID."""
@@ -28,4 +29,6 @@ class Sensor(models.Model):
 
 class UsersTest(models.Model):
     email = models.CharField(max_length=50, default="email")
-    password = models.CharField (max_length=16, default="password")
+    password = models.CharField(max_length=16, default="password")
+    sensors = models.TextField(default="None")  # Store sensor IDs as a JSON string
+

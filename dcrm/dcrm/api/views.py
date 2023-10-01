@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth.models import User
+import json
 
 
 @api_view(['GET', 'POST', 'DELETE'])
@@ -205,6 +206,32 @@ def usersData(request):
     return Response(serializer.data)
 
 @api_view(['POST'])
+def addSensorsToUser(request, user_id):
+    try:
+        user = UsersTest.objects.get(id=user_id)
+    except UsersTest.DoesNotExist:
+        return Response({'message': 'User not found.'}, status=404)
+
+    # Get the list of sensor IDs as a string from the request data
+    sensor_ids_str = request.data.get('sensor_ids', None)
+
+    if sensor_ids_str is None:
+        return Response({'message': 'Sensor IDs are required in the request data.'}, status=400)
+
+    try:
+        # Parse the JSON string to get a list of sensor IDs
+        sensor_ids = json.loads(sensor_ids_str)
+    except json.JSONDecodeError:
+        return Response({'message': 'Invalid JSON data for sensor IDs.'}, status=400)
+
+    # Add the parsed sensor IDs to the user's sensors field
+    user.sensors += sensor_ids
+    user.save()
+
+    # Return a success response
+    return Response({'message': f'Sensors added to user {user_id}.'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
 def authenticate_user(request):
     data = request.data
     email = data.get('email', None)
@@ -223,6 +250,8 @@ def authenticate_user(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({'message': 'Authentication failed.'}, status=401)
+
+
 
 # class UserRecordView(APIView):
 #     """
