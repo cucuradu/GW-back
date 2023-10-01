@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth.models import User
+import json
 
 
 @api_view(['GET', 'POST', 'DELETE'])
@@ -206,6 +207,26 @@ def usersData(request):
     return Response(serializer.data)
 
 @api_view(['POST'])
+def addSensorsToUser(request, user_id):
+    try:
+        user = UsersTest.objects.get(id=user_id)
+    except UsersTest.DoesNotExist:
+        return Response({'message': 'User not found.'}, status=404)
+    
+    sensor_ids = request.data.get('sensor_ids', [])
+
+    for sensor_id in sensor_ids:
+        try:
+            sensor = Sensor.objects.get(id=sensor_id)
+            user.sensors.add(sensor)
+
+        except Sensor.DoesNotExist:
+            return Response({'message': f'Sensor with ID {sensor_id} not found.'}, status=404)
+
+    user.save()
+    return Response({'message': f'Sensors added to user {user_id}.'}, status=200)
+
+@api_view(['POST'])
 def authenticate_user(request):
     data = request.data
     email = data.get('email', None)
@@ -224,6 +245,8 @@ def authenticate_user(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({'message': 'Authentication failed.'}, status=401)
+
+
 
 # class UserRecordView(APIView):
 #     """
