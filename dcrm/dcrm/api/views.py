@@ -51,6 +51,7 @@ plant_ranges = {
     "Cucumber": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (20.0, 30.0), "potassium": (32.0, 45.0)},
     "Carrots": {"temperature": (15.0, 20.0), "nitrogen": (40.0, 60.0), "phosphorus": (20.0, 30.0), "potassium": (120.0, 160.0)},
     "Potatoes": {"temperature": (10.0, 35.0), "nitrogen": (100.0, 150.0), "phosphorus": (150.0, 200.0), "potassium": (200.0, 250.0)},
+    
 }
 
 def generate_recommendation(sensor_reading, plant_ranges):
