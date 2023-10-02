@@ -56,6 +56,7 @@ plant_ranges = {
 }
 
 def generate_recommendation(sensor_reading, plant_ranges):
+
     plant_name = sensor_reading.plant
     plant_range = plant_ranges.get(plant_name) 
 
@@ -66,8 +67,15 @@ def generate_recommendation(sensor_reading, plant_ranges):
     nitrogen = sensor_reading.nitrogen
     phosphorus =sensor_reading.phosphorus
     potassium = sensor_reading.potassium
+    humidity = sensor_reading.humidity
 
     problem_count = 0
+
+    if not humidity:
+        humidity_recommendation = "Humidity is low. Consider increasing humidity levels."
+        problem_count += 1
+    else:
+        humidity_recommendation = "Humidity is okay"
 
     if plant_range["temperature"][0] <= temperature <= plant_range["temperature"][1]:
        temperature_recommendation = "Temperature conditions are suitable."
@@ -78,7 +86,7 @@ def generate_recommendation(sensor_reading, plant_ranges):
 
     nutrient_recommendation = []
     for nutrient, (min_range, max_range) in plant_range.items():
-        if nutrient == "temperature":
+        if nutrient == "temperature" or nutrient == "humidity":
             continue
         nutrient_value = getattr(sensor_reading, nutrient)
         if min_range <= nutrient_value <= max_range:
@@ -88,6 +96,7 @@ def generate_recommendation(sensor_reading, plant_ranges):
             problem_count += 1
 
     return {
+        "humidity_recommendation": humidity_recommendation,
         "temperature_recommendation": temperature_recommendation,
         "nutrient_recommendation": nutrient_recommendation
     }, problem_count
@@ -168,6 +177,7 @@ def getRecommendation(request):
                 "name": sensor.name,
                 "plant": sensor.plant,
                 "temperature": sensor.temperature,
+                "humidity": sensor.humidity,
                 "nitrogen": sensor.nitrogen,
                 "phosphorus": sensor.phosphorus,
                 "potassium": sensor.potassium,
