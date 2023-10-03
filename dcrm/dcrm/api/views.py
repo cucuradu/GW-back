@@ -50,8 +50,8 @@ def getRoutes(request):
 plant_ranges = {
     "Tomato": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
     "Cucumber": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
-    "Carrots": {"temperature": (10.0, 20.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
-    "Potatoes": {"temperature": (10.0, 35.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
+    "Carrots": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
+    "Potatoes": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
     
 }
 
