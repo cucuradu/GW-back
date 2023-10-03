@@ -48,10 +48,10 @@ def getRoutes(request):
     return Response(routes)
 
 plant_ranges = {
-    "Tomato": {"temperature": (10.0, 30.0), "nitrogen": (20.0, 40.0), "phosphorus": (30.0, 50.0), "potassium": (32.0, 60.0)},
-    "Cucumber": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (20.0, 30.0), "potassium": (32.0, 45.0)},
-    "Carrots": {"temperature": (15.0, 20.0), "nitrogen": (40.0, 60.0), "phosphorus": (20.0, 30.0), "potassium": (120.0, 160.0)},
-    "Potatoes": {"temperature": (10.0, 35.0), "nitrogen": (100.0, 150.0), "phosphorus": (150.0, 200.0), "potassium": (200.0, 250.0)},
+    "Tomato": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
+    "Cucumber": {"temperature": (10.0, 30.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
+    "Carrots": {"temperature": (10.0, 20.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
+    "Potatoes": {"temperature": (10.0, 35.0), "nitrogen": (40.0, 60.0), "phosphorus": (30.0, 50.0), "potassium": (40.0, 70.0)},
     
 }
 
@@ -189,6 +189,36 @@ def getRecommendation(request):
         })
 
     return Response(recommendations)
+
+@api_view(['GET'])
+def get_location_by_sensor_id(request, sensor_id):
+    try:
+        sensor = Sensor.objects.get(id=sensor_id)
+    except Sensor.DoesNotExist:
+        return Response({'error': 'Sensor not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Extract the location from the sensor
+    location = sensor.location
+
+    return Response({'location': location}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def add_location_to_sensor(request, sensor_id):
+    try:
+        sensor = Sensor.objects.get(id=sensor_id)
+    except Sensor.DoesNotExist:
+        return Response({'error': 'Sensor not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Extract the location data from the request data
+    location = request.data.get('location', '')
+
+    # Update the sensor's location field
+    sensor.location = location
+    sensor.save()
+
+    # Serialize the updated sensor and return it in the response
+    serializer = SensorSerializer(sensor)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['PUT'])
 def updateSensorData(request):

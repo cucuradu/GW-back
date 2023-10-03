@@ -11,6 +11,8 @@ urlpatterns = [
     path('sensors/<str:pk>/update/', views.updateSensor),
     path('sensors/<str:pk>/', views.getSensor),
     path('sensors/<str:pk>/delete/', views.deleteSensor),
+    path('sensor/add_location/<str:sensor_id>/', views.add_location_to_sensor, name='add_location_to_sensor'),
+    path('sensor/get_location/<str:sensor_id>/', views.get_location_by_sensor_id, name='get_location_by_sensor_id'),
     path('apiRest/recommendations/', views.getRecommendation),
     path('api/update_sensors/', views.updateSensorData, name='update_sensor'),
     path('api/user/<int:id>', views.usersData, name='get_user'),
