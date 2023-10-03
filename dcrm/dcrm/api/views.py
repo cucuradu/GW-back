@@ -71,15 +71,16 @@ def generate_recommendation(sensor_reading, plant_ranges):
 
     problem_count = 0
 
-    if not humidity:
+    if humidity:
+        humidity_recommendation = "Humidity is okay"
+        problem_count = 0
+    else:
         humidity_recommendation = "Humidity is low. Consider increasing humidity levels."
         problem_count += 1
-    else:
-        humidity_recommendation = "Humidity is okay"
+
 
     if plant_range["temperature"][0] <= temperature <= plant_range["temperature"][1]:
        temperature_recommendation = "Temperature conditions are suitable."
-       problem_count = 0
     else:
         temperature_recommendation = "Temperature conditions are not optimal."
         problem_count += 1
@@ -225,11 +226,7 @@ def usersData(request, id):
 
     serializer = UserTestSerializer(user)
 
-    sensor_data = serializer.data.get('sensors', [])
-
-    response_data = {'sensors': sensor_data}
-
-    return Response(response_data, status=status.HTTP_200_OK)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def addSensorsToUser(request, user_id):
