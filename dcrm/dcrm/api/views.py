@@ -189,7 +189,7 @@ def getRecommendation(request):
         })
 
     return Response(recommendations)
-
+"""Get sensor location"""
 @api_view(['GET'])
 def get_location_by_sensor_id(request, sensor_id):
     try:
@@ -201,7 +201,7 @@ def get_location_by_sensor_id(request, sensor_id):
     location = sensor.location
 
     return Response({'location': location}, status=status.HTTP_200_OK)
-
+"""Post sensor location"""
 @api_view(['POST'])
 def add_location_to_sensor(request, sensor_id):
     try:
