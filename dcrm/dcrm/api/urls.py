@@ -1,11 +1,19 @@
 from django.urls import path
 from . import views
-# from .views import UserRecordView
+from .auth_views import RegisterView, UserProfileView, LogoutView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 app_name = 'apiRest'
 urlpatterns = [
+    # Authentication endpoints
+    path('auth/register/', RegisterView.as_view(), name='register'),
+    path('auth/login/', TokenObtainPairView.as_view(), name='login'),
+    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/profile/', UserProfileView.as_view(), name='profile'),
+    path('auth/logout/', LogoutView.as_view(), name='logout'),
+    
+    # Existing endpoints
     path('', views.getRoutes),
-    #path('user/', UserRecordView.as_view(), name='users'), !don't use it for presentation
     path('sensors/', views.getSensors),
     path('sensors/create/', views.createSensor),
     path('sensors/<str:pk>/update/', views.updateSensor),

@@ -1,6 +1,7 @@
 import random
 import string
 from django.db import models
+from django.contrib.auth.models import User
 import json
 
 def generate_unique_id():
@@ -12,6 +13,7 @@ def generate_unique_id():
             return random_id
 
 class Sensor(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sensors', null=True, blank=True)
     name = models.TextField(max_length=50, default="sensorName")
     plant = models.CharField(max_length=50, default="none")
     humidity = models.BooleanField(default=False)
