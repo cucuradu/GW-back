@@ -6,7 +6,7 @@ from .serializers import UserTestSerializer
 from .models import UsersTest
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from django.contrib.auth.models import User
 import json
 
@@ -259,24 +259,26 @@ def usersData(request, id):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-def addSensorsToUser(request, user_id):
-    try:
-        user = UsersTest.objects.get(id=user_id)
-    except UsersTest.DoesNotExist:
-        return Response({'message': 'User not found.'}, status=404)
-    
+@permission_classes([IsAuthenticated])
+def addSensorsToUser(request):
     sensor_ids = request.data.get('sensor_ids', [])
 
     for sensor_id in sensor_ids:
         try:
             sensor = Sensor.objects.get(id=sensor_id)
-            user.sensors.add(sensor)
-
+            sensor.owner = request.user
+            sensor.save()
         except Sensor.DoesNotExist:
             return Response({'message': f'Sensor with ID {sensor_id} not found.'}, status=404)
 
-    user.save()
-    return Response({'message': f'Sensors added to user {user_id}.'}, status=200)
+    return Response({'message': f'Sensors added to user {request.user.username}.'}, status=200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getUserSensors(request):
+    sensors = request.user.sensors.all()
+    sensor_ids = [sensor.id for sensor in sensors]
+    return Response({'sensors': sensor_ids}, status=200)
 
 @api_view(['POST'])
 def authenticate_user(request):
