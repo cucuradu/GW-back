@@ -28,7 +28,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-@fm966&l%oif)_8vktj9f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS_ENV = os.environ.get('ALLOWED_HOSTS')
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS_ENV.split(',') if h.strip()]
+else:
+    ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -105,7 +109,7 @@ WSGI_APPLICATION = 'dcrm.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Use SQLite for development (easier setup)
+# Default to SQLite for local development
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -113,13 +117,13 @@ DATABASES = {
     }
 }
 
-# For production with MySQL, use:
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default='mysql://root:QX0Y2DB543576@localhost:3306/growwise',
-#         conn_max_age=600
-#     )
-# }
+# If DATABASE_URL is set (e.g. Render PostgreSQL or MySQL in production), configure it
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+    )
 
 # Static files (CSS, JavaScript, Images)
 STATIC_ROOT = BASE_DIR / "staticfiles"

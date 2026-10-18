@@ -12,11 +12,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies
-COPY dcrm/dcrm/requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire project
-COPY dcrm/dcrm /app
+COPY . /app
 
 # Collect static files
 RUN python manage.py collectstatic --no-input
@@ -25,4 +25,4 @@ RUN python manage.py collectstatic --no-input
 EXPOSE 8000
 
 # Run migrations and start server
-CMD python manage.py migrate && gunicorn dcrm.wsgi:application --bind 0.0.0.0:8000
+CMD ["sh", "-c", "python manage.py migrate && gunicorn dcrm.wsgi:application --bind 0.0.0.0:8000"]
